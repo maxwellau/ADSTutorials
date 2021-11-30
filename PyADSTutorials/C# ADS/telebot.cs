@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json;
 using System.Net.Http;
-using Newtonsoft.Json;
+
 class telegramBot
     {
         // INITIALISE HTTP CLIENT AND CONSTRUCTOR
