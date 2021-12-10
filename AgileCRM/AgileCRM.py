@@ -1,7 +1,7 @@
-#Ensure to import dependencies
-# import pandas as pd
-# import requests
-# import json
+#create CRM Class
+import pandas as pd
+import requests
+import json
 class CRM:
     def __init__(self, apikey, email, domain):
         self.apikey = apikey
@@ -77,6 +77,10 @@ class CRM:
         assert company == str(company), 'company has to be a String'
         return self.agileCRM(f"search?q={company}&page_size=10&type='COMPANY'","GET",None,"application/json")
     
+    def searchIdFromName(self, name):
+        assert name == str(name), 'company has to be a String'
+        return self.agileCRM(f"search?q={name}&page_size=10&type='PERSON'","GET",None,"application/json")
+    
     def makeDeal(self, dealName, expectedValue, probability, milestone, contactID):
         assert dealName == str(dealName), 'dealName has to be a String'
         assert probability == str(probability), 'probability has to be a String'
@@ -105,7 +109,7 @@ class CRM:
         }
         return self.agileCRM("notes","POST",note_data,"application/json")
     
-    def createContact(self, firstName, lastName, company, title, email, address, customField, customContent):
+    def createContact(self, firstName, lastName, tags, company, title, email, address, customField, customContent):
         assert firstName == str(firstName), 'firstName has to be a String'
         assert lastName == str(lastName), 'probability has to be a String'
         assert company == str(company), 'company has to be a String'
@@ -114,10 +118,11 @@ class CRM:
         assert address == str(address), 'address has to be a String'
         assert customField == str(customField), 'customField has to be a String'
         assert customContent == str(customContent), 'customContent has to be a String'
+        assert type(tags) == list, 'tags has to be a list of Strings'
         contact_data = {
         "star_value": "0",
         "lead_score": "",
-        "tags": [],
+        "tags": tags,
         "properties": [
             {
                 "type": "SYSTEM",
@@ -159,3 +164,49 @@ class CRM:
             }
         resp = self.agileCRM("contacts","POST",contact_data,"application/json")
         return resp
+
+    def makeCompany(self, tags, companyType, name, website, email, phoneNumber, address):
+        assert type(tags) == list, 'tags has to be a list of Strings'
+        assert companyType == str(companyType), 'companyType has to be a String'
+        assert name == str(name), 'name has to be a String'
+        assert website == str(website), 'website has to be a String'
+        assert email == str(email), 'email has to be a String'
+        assert phoneNumber == str(phoneNumber), 'phoneNumber has to be a String'
+        assert address == str(address), 'address has to be a String'
+        company_data = {
+        "type": "COMPANY",
+        "tags": tags,
+        "properties": [
+            {
+                "name": "Company Type",
+                "type": "CUSTOM",
+                "value": companyType
+            },
+            {
+                "type": "SYSTEM",
+                "name": "name",
+                "value": name
+            },
+            {
+                "name": "email",
+                "value": email,
+                "subtype": ""
+            },
+            {
+                "name": "phone",
+                "value": phoneNumber,
+                "subtype": ""
+            },
+            {
+                "name": "website",
+                "value": website,
+                "subtype": ""
+            },
+            {
+                "name": "address",
+                "value": address,
+                "subtype": "office"
+            }
+            ]
+        }
+        return self.agileCRM("contacts","POST",company_data,"application/json")
